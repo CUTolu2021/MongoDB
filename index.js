@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose')
 const dotenv = require('dotenv').config()
 const authorRoute = require('./route/author.route')
+const blogRoute = require('./route/blog.route')
 
 
 const app = express()
@@ -22,6 +23,7 @@ const callBack = () => {
 }
 //Route
 app.use('/authors',authorRoute)
+app.use('/blogs',blogRoute)
 
 app.use('*',(req, res) => {
     res.send('Not Found')
