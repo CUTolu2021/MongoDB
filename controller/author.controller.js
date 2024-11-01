@@ -3,6 +3,7 @@ const asyncHandler = require('express-async-handler')
 const errorHandler = require("./error.controller")
 
 
+const createAuthor = asyncHandler(async(req,res) => {
     const author = await Author.create(req.body)
     res.status(201).json(author)
 }, errorHandler)
