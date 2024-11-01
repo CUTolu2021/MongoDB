@@ -16,18 +16,6 @@ const authorschema = new Schema({
 })
 const Author = model("Author",authorschema)
 
-const blogSchema = new Schema({
-    title : String,
-    description : String,
-    image : String,
-    author : {
-        type : Schema.Types.ObjectId,
-        ref : "Author"
-    }
-},
-{
-    timestamps:true
-})
-const Blog = model("Blog",blogSchema)
 
-module.exports = {Author,Blog}
+
+module.exports = {Author}
