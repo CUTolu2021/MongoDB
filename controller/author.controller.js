@@ -1,67 +1,44 @@
-const {Author} = require("../model/author.model")
-const asyncHandler = require('express-async-handler')
-const errorHandler = require("./error.controller")
+const bcrypt = require("bcryptjs");
 
+const {Author} = require("../model/author.model");
+const {
+    createEntity,
+    getAllEntities,
+    getEntityById,
+    updateEntityById,
+    deleteEntityById
+} = require("./generic.controller");
 
-const createAuthor = asyncHandler(async(req,res) => {
-    const author = await Author.create(req.body)
-    res.status(201).json(author)
-}, errorHandler)
+const createAuthor = createEntity(Author);
+const getAuthors = getAllEntities(Author);
+const getUserById = getEntityById(Author);
+const updateAuthorById = updateEntityById(Author);
+const deleteAuthorById = deleteEntityById(Author);
 
-
-const getAuthors = async (req, res) => {
-    try {
-        const authors = await Author.find();
-        res.json(authors);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+const signIn = async(req,res,next) => {
+    const {username, password} = req.body;
+    const user = await Author.findOne({username}).select("+password");
+    if(!user){
+        return res.status(401).json({message: "Invalid Username or Password"});
     }
-}
-
-const getUserById = asyncHandler(async (req, res) => {
-        const { authorId } = req.params;
-        const user = await Author.findById(authorId);
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        res.json(user);
-}, errorHandler)
-
-const updateAuthorById = async (req, res) => {
-    try{
-        const {authorId} = req.params
-        const user = await Author.findByIdAndUpdate(authorId,req.body,{new:true})
-        console.log(user)
-        if (!user) {
-            return res.status(404).json({ message: "Author does not exist" });
-        }
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if(!isMatch){
+        return res.status(401).json({message: "Invalid Username or Password"});
     }
+    user.password = undefined
+    
+    req.user = user;
+    console.log(" logged in");
+    res.status(200).json(user);
+    
+    
 }
-
-const deleteAuthorById = async (req, res) => {
-    try{
-        const {authorId} = req.params
-        const user = await Author.findByIdAndDelete(authorId)
-        console.log(user)
-        if (!user) {
-            return res.status(404).json({ message: "Author does not exist" });
-        }
-        res.status(204).json({message: "Author has been deleted successfully"});
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-}
-
-
-
 
 module.exports = {
     createAuthor,
     getAuthors,
     getUserById,
     updateAuthorById,
-    deleteAuthorById
-}
+    deleteAuthorById,
+    signIn
+};

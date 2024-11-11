@@ -2,6 +2,7 @@ const { Schema, model } = require("mongoose");
 
 const authorschema = new Schema({
     name : String,
+    username : {type:String, unique:true, required:[true,"Username is a required field."]},
     age : Number,
     image : String,
     password : {

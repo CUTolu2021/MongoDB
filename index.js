@@ -2,7 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose')
 const dotenv = require('dotenv').config()
 const authorRoute = require('./route/author.route')
-const blogRoute = require('./route/blog.route')
+const blogRoute = require('./route/blog.route');
+const errorHandler = require('./controller/error.controller');
 
 
 const app = express()
@@ -25,9 +26,12 @@ const callBack = () => {
 app.use('/authors',authorRoute)
 app.use('/blogs',blogRoute)
 
+
 app.use('*',(req, res) => {
     res.send('Not Found')
   })
+
+app.use(errorHandler)
 
 app.listen(process.env.PORT,callBack)
 
